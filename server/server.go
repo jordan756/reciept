@@ -1,7 +1,7 @@
 package server
 
 import (
-	"reciept/handler"
+	"receipt/handler"
 
 	"github.com/gin-gonic/gin"
 )

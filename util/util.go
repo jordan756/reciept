@@ -1,81 +1,77 @@
 package utils
 
 import (
-	"fmt"
 	"math"
-	"reciept/structs"
+	"receipt/structs"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
 )
 
-func CaculatePoints(reciept structs.Reciept) int {
+func CaculatePoints(receipt structs.Receipt) int {
 	sum := 0
-	for _, char := range reciept.Retailer {
+	for _, char := range receipt.Retailer {
 		if unicode.IsLetter(char) {
 			sum += 1
 		}
 	}
-	fmt.Println("retailer added ", sum, " points") // caculate retailer
+	//fmt.Println("retailer added ", sum, " points") // caculate retailer
 
-	total, err := strconv.ParseFloat(reciept.Total, 64)
+	total, err := strconv.ParseFloat(receipt.Total, 64)
 	if err != nil {
 		return -1
 	}
 
 	if math.Round(total) == total { //check if no cents remainder in total
 		sum += 50
-		fmt.Println("total added ", 50, " points")
+	//	fmt.Println("total added ", 50, " points")
 	}
 
 	if math.Mod(total, .25) == 0 { //check if total is multiple .25
 		sum += 25
-		fmt.Println("total added ", 25, " points")
+	//	fmt.Println("total added ", 25, " points")
 	}
 
-	quotient := len(reciept.Items) / 2 //give points by item list length 2:5
+	quotient := len(receipt.Items) / 2 //give points by item list length 2:5
 	sum += (quotient * 5)
 
-	fmt.Println("Items length added ", quotient*5, " points")
+	//fmt.Println("Items length added ", quotient*5, " points")
 
-	for _, item := range reciept.Items {
+	for _, item := range receipt.Items {
 		description := strings.TrimSpace(item.ShortDescription) //give points if descrip is / by 3
 		if math.Mod(float64(len(description)), 3) == 0 {
 			price, _ := strconv.ParseFloat(item.Price, 64)
 			sum += int(math.Ceil(.2 * price))
-			fmt.Println(description, ": added ", math.Ceil(.2*price), " points")
+	//		fmt.Println(description, ": added ", math.Ceil(.2*price), " points")
 		}
 
 	}
 
 	layout := "2006-01-02"
-	date, err := time.Parse(layout, reciept.PurchaseDate)
+	date, err := time.Parse(layout, receipt.PurchaseDate)
 	if err != nil {
-		fmt.Println("Error:", err)
+	//	fmt.Println("Error:", err)
 		return -1
 	}
 	if (date.Day() % 2) == 1 { // if odd day, add 6 points
 		sum += 6
-		fmt.Println(date, " added ", 6, " points")
+	//	fmt.Println(date, " added ", 6, " points")
 	}
 
 	layout = "15:04"
-	purchaseTime, err := time.Parse(layout, reciept.PurchaseTime) // add 10 points if between 2-4
+	purchaseTime, err := time.Parse(layout, receipt.PurchaseTime) // add 10 points if between 2-4
 	if err != nil {
-		fmt.Println("Error:", err)
+	//	fmt.Println("Error:", err)
 		return -1
 	}
 	two, _ := time.Parse(layout, "14:00")
 	four, _ := time.Parse(layout, "16:00")
-	fmt.Println(purchaseTime.Hour(), " bug")
 	if purchaseTime.After(two) && purchaseTime.Before(four) {
 		sum += 10
-		fmt.Println(purchaseTime, " added ", 10, " points")
+	//	fmt.Println(purchaseTime, " added ", 10, " points")
 	}
 
 	return sum
 
 }
-
-//func verifyRecipt(reciept structs.Reciept) bool {}

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"reciept/server"
+	"receipt/server"
 )
 
 func main() {
