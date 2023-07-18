@@ -16,6 +16,8 @@ curl --location 'http://localhost:8080/receipts/process' \
 }'
 
 
+
+
 cURL for getPoints endpoint
 
 curl --location 'http://localhost:8080/receipts/7c020a77-f9b5-4458-aa0f-21cbbb1bc7ad/points' \
