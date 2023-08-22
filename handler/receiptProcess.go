@@ -3,13 +3,13 @@ package handler
 import (
 	"crypto/sha256"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
 	"sync"
 	"time"
 
+	"receipt/config"
 	"receipt/structs"
 	utils "receipt/util"
 
@@ -44,7 +44,7 @@ func init() {
 		if amount < 0 {
 			return false
 		}
-		regex := regexp.MustCompile(`^[0-9]*\.[0-9]{2}$`)
+		regex := regexp.MustCompile(`[0-9]*\.[0-9]{2}$`)
 		return regex.MatchString(fl.Field().String())
 	})
 }
@@ -53,18 +53,17 @@ func ProcessReceipts(c *gin.Context) {
 	var receipt structs.Receipt
 
 	if err := c.ShouldBindJSON(&receipt); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, structs.ErrorResponse{Error: config.JsonError + err.Error()})
 		return
 	}
 	err := validate.Struct(receipt)
 	if err != nil {
-		fmt.Println("Validation error:", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, structs.ErrorResponse{Error: config.ValidationError + err.Error()})
 		return
 	}
 	text, err := json.Marshal(receipt)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, structs.ErrorResponse{Error: config.JsonError + err.Error()})
 		return
 	}
 	hash := sha256.Sum256([]byte(text))
@@ -74,13 +73,17 @@ func ProcessReceipts(c *gin.Context) {
 
 
 	if _,ok := allReciepts[hash]; ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "repeat reciept"})
+		c.JSON(http.StatusBadRequest, structs.ErrorResponse{Error: config.RepeatError})
 		return
 	}
 	allReciepts[hash] = false
 
 	id := uuid.New()
-	value := utils.CaculatePoints(receipt)
+	value, err := utils.CaculatePoints(receipt)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, structs.ErrorResponse{Error: config.CaculatePointsFailed + err.Error()})
+		return
+	}
 	M[id.String()] = value
 
 
@@ -97,7 +100,7 @@ func GetPoints(c *gin.Context) {
 	
 	if !ok {
 
-		c.IndentedJSON(http.StatusNotFound, "invalid id")
+		c.IndentedJSON(http.StatusBadRequest, structs.ErrorResponse{Error: config.GetIdError})
 		return
 	}
 

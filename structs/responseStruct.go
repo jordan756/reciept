@@ -6,3 +6,7 @@ type PointsResponse struct {
 type IdResponse struct {
 	Id string `json:"id"`
 }
+
+type ErrorResponse struct {
+	Error string `json:"Error Message"`
+}

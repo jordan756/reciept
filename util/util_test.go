@@ -21,7 +21,7 @@ func TestCaculatePointsSuccess(t *testing.T) {
 			{ShortDescription: "   Klarbrunn 12-PK 12 FL OZ  ", Price: "12.00"},
 		},
 	}
-	sum := CaculatePoints(recipt)
+	sum,_ := CaculatePoints(recipt)
 	assert.Equal(t, 28, sum)
 }
 
@@ -39,6 +39,6 @@ func TestCaculatePointsFailure(t *testing.T) {
 			{ShortDescription: "   Klarbrunn 12-PK 12 FL OZ  ", Price: "12.00"},
 		},
 	}
-	sum := CaculatePoints(recipt)
-	assert.Equal(t, -1, sum)
+	_,err := CaculatePoints(recipt)
+	assert.NotEqual(t, err, nil)
 }

@@ -9,10 +9,10 @@ import (
 	"unicode"
 )
 
-func CaculatePoints(receipt structs.Receipt) int {
+func CaculatePoints(receipt structs.Receipt) (int,error) {
 	sum := 0
 	for _, char := range receipt.Retailer {
-		if unicode.IsLetter(char) {
+		if unicode.IsLetter(char)  || unicode.IsDigit(char) {
 			sum += 1
 		}
 	}
@@ -20,7 +20,7 @@ func CaculatePoints(receipt structs.Receipt) int {
 
 	total, err := strconv.ParseFloat(receipt.Total, 64)
 	if err != nil {
-		return -1
+		return sum,err
 	}
 
 	if math.Round(total) == total { //check if no cents remainder in total
@@ -45,14 +45,13 @@ func CaculatePoints(receipt structs.Receipt) int {
 			sum += int(math.Ceil(.2 * price))
 	//		fmt.Println(description, ": added ", math.Ceil(.2*price), " points")
 		}
-
 	}
 
 	layout := "2006-01-02"
 	date, err := time.Parse(layout, receipt.PurchaseDate)
 	if err != nil {
 	//	fmt.Println("Error:", err)
-		return -1
+		return sum,err
 	}
 	if (date.Day() % 2) == 1 { // if odd day, add 6 points
 		sum += 6
@@ -63,7 +62,7 @@ func CaculatePoints(receipt structs.Receipt) int {
 	purchaseTime, err := time.Parse(layout, receipt.PurchaseTime) // add 10 points if between 2-4
 	if err != nil {
 	//	fmt.Println("Error:", err)
-		return -1
+		return sum,err
 	}
 	two, _ := time.Parse(layout, "14:00")
 	four, _ := time.Parse(layout, "16:00")
@@ -72,6 +71,6 @@ func CaculatePoints(receipt structs.Receipt) int {
 	//	fmt.Println(purchaseTime, " added ", 10, " points")
 	}
 
-	return sum
+	return sum,nil
 
 }
