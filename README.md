@@ -1,5 +1,3 @@
-# Reciept: a take home challenge for https://github.com/fetch-rewards/receipt-processor-challenge
-------------
 
 to run locally: 'go run main.go'
 
