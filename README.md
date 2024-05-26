@@ -1,8 +1,9 @@
-
+# RECEIPT PROCESSOR
+### Service that processes reciepts using http Get and Post Requests
 to run locally: 'go run main.go'
 
 cURL for proccessReciept endpoint
-
+````
 curl --location 'http://localhost:8080/receipts/process' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -13,10 +14,11 @@ curl --location 'http://localhost:8080/receipts/process' \
   ],
   "total": "35.35"
 }'
-
+````
 
 
 
 cURL for getPoints endpoint
-
+````
 curl --location 'http://localhost:8080/receipts/7c020a77-f9b5-4458-aa0f-21cbbb1bc7ad/points' \
+````
